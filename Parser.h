@@ -14,15 +14,14 @@ string filename; //stores filename
   cin >> filename;
 	fin.open(filename);
   cout << "\e[0;32mFile reading succesful.\x1b[0m\n";
-  while( getline(fin,word,',') )  //write into file name
+  // Since it is a csv file, we will use getline() to read the file with , as the delimiter
+  while( getline(fin,word,',') )  //read the file line by line
   {
     getline(fin,pos,',');
-    getline(fin,meaning,'\n');
+    getline(fin,meaning,'\n'); //read the line till the end for meanings
     Dictionary dict = Dictionary(word,pos,meaning);
     t.insert(dict);
   }
-  
-
 	fin.close();
 }
 
@@ -36,7 +35,9 @@ void writeToFile(Trie t) //write the linked list to a text file
   dictFile.open(filename, std::ios::app); //create/open a text file in append mode. new information is always added to the end
   dictFile << "Word,Part of Speech,Meaning" << endl;
   // traverse the trie and write to file
+  TrieNode *root = t.root;
   writeToFileUtil(t.root, dictFile);
+  t.root = root;
   cout << "\e[0;32mFile writing succesful.\x1b[0m\n";
   dictFile.close();
 }
@@ -76,25 +77,25 @@ void mainMenu() //menu function
 
       case('1'):
       {
-        readFileData(trie);
+        readFileData(trie); //read the file data
       }; break;
 
       case('2'):
       {
-        writeToFile(trie);
+        writeToFile(trie); //write to file
       }; break;
 
       case('3'):
       {
         cout << "\e[46mEnter the word: \x1b[0m ";
         cin.ignore();
-        cin >> word;
-        Dictionary dict = trie.search(word);
-        if(dict.word == "")
+        cin >> word; //get the word from user
+        Dictionary dict = trie.search(word); //search the word in the trie
+        if(dict.word == "") //if word not found
         {
           cout << "\e[0;31m\nWord not found!\n\x1b[0m\n";
         }
-        else
+        else //if word found
         {
           cout << "\e[0;32m\nWord found!\n\x1b[0m\n";
           cout << "\e[1;33mWord: \x1b[0m" << dict.word << endl;
@@ -103,29 +104,28 @@ void mainMenu() //menu function
           cout<< "\e[0;32m\nDo you want to add the word to favorities? y/n \x1b[0m";
           string fav;
           cin.ignore();
-          cin>>fav;
+          cin>>fav; // Ask user if he wants to add the word to favorities
           if (fav=="y")
             favorities.insert(dict);
+            cout<<"\e[0;32mWord added to favorities!\x1b[0m";
         }
       }; break;
 
       case('4'):
       {
-        string auth;
+        string word;
         do
         {
           cout << "\e[1;33mFavorities: \n\x1b[0m ";
-          favorities.display(favorities.root,"");
+          favorities.display(favorities.root,""); //display the favorities
           cout << "\e[46m Do you want to remove any word from favorities.\nIf yes Enter the word! Enter -1 to exit: \x1b[0m ";
           cin.ignore();
-          cin >> auth;
-          if (auth!="-1"){
-            favorities.deleteWord(auth);
+          cin >> word;
+          if (word!="-1"){
+            favorities.deleteWord(word); //delete the word from favorities
             cout<<"\e[0;32mWord deleted succesfully!\x1b[0m";
           }
-        } while (auth!="-1");
-        
-        
+        } while (word!="-1"); //loop until user enters -1
       }; break;
 
       case('5'):
@@ -133,23 +133,28 @@ void mainMenu() //menu function
         cout << "\e[46mEnter the Prefix\x1b[0m ";
         cin.ignore();
         cin >> word;
-        Trie t = filterWords(trie, word);
-        cout<<"\e[0;32mFiltered the list succesfully!\n\nDo you want to write it in a file? y/n \x1b[0m\n";
+        Trie t = filterWords(trie, word); //filter the words
+        cout<<"\e[0;32mFiltered the list succesfully!\n\nDo you want to write (w) it in a file or want to see (d)? w/d \x1b[0m\n";
         string write;
-        cin >> write;
-        if(write == "y")
+        cin >> write; // Ask user if he wants to write the filtered list in a file
+        if(write == "w")
         {
           writeToFile(t);
+          cout<<"\e[0;32mWritten to file succesfully!\x1b[0m";
         }
-
+        else if(write == "d")
+        {
+          t.display(t.root,"");
+        }
       }; break;
 
       case('6'):
       {
-	cout << "\e[46mEnter the word: \x1b[0m ";
+	      cout << "\e[46mEnter the word: \x1b[0m ";
         string s;
         cin>>s;
-        trie.deleteWord(s);
+        trie.deleteWord(s); //delete the word from trie
+        cout<<"\e[0;32mWord deleted succesfully!\x1b[0m";
       }; break;
 
       case('s'):
