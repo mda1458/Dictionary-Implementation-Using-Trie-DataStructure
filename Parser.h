@@ -86,7 +86,7 @@ void mainMenu() //menu function
 
       case('3'):
       {
-        cout << "\e[46mEnter the word\x1b[0m ";
+        cout << "\e[46mEnter the word: \x1b[0m ";
         cin.ignore();
         cin >> word;
         Dictionary dict = trie.search(word);
@@ -146,11 +146,11 @@ void mainMenu() //menu function
 
       case('6'):
       {
-        trie.display(trie.root,"");
+	cout << "\e[46mEnter the word: \x1b[0m ";
         string s;
         cin>>s;
         trie.deleteWord(s);
-      }
+      }; break;
 
       case('s'):
       {
