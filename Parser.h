@@ -5,7 +5,7 @@
 using namespace std;
 
 string filename; //stores filename
-  void readFileData(Trie t) //reads text from a file and writes it to the AVL tree
+  void readFileData(Trie *t) //reads text from a file and writes it to the AVL tree
 {
 	string word,pos, meaning;
 	fstream fin;
@@ -20,12 +20,12 @@ string filename; //stores filename
     getline(fin,pos,',');
     getline(fin,meaning,'\n'); //read the line till the end for meanings
     Dictionary dict = Dictionary(word,pos,meaning);
-    t.insert(dict);
+    t->insert(dict);
   }
 	fin.close();
 }
 
-void writeToFile(Trie t) //write the linked list to a text file
+void writeToFile(Trie *t) //write the linked list to a text file
 {
   // string word, pos, meaning;
   fstream dictFile; //create fstream object for the file
@@ -35,9 +35,9 @@ void writeToFile(Trie t) //write the linked list to a text file
   dictFile.open(filename, std::ios::app); //create/open a text file in append mode. new information is always added to the end
   dictFile << "Word,Part of Speech,Meaning" << endl;
   // traverse the trie and write to file
-  TrieNode *root = t.root;
-  writeToFileUtil(t.root, dictFile);
-  t.root = root;
+  TrieNode *root = t->root;
+  writeToFileUtil(t->root, dictFile);
+  t->root = root;
   cout << "\e[0;32mFile writing succesful.\x1b[0m\n";
   dictFile.close();
 }
@@ -56,8 +56,8 @@ void mainMenu() //menu function
   cout << "\e[1;35m****\e[0;37m" <<  "\e[1;33m   @       @        @        @                @            @          @ @ @      @         @  @       @    @       @        @       \x1b[0m"  <<  "\e[1;35m****\e[0;37m" << endl;
   cout << "\e[1;35m****\e[0;37m" <<  "\e[1;33m   @ @ @ @      @ @ @ @ @      @ @ @ @        @        @ @ @ @ @                              @       @    @       @        @       \x1b[0m"  <<  "\e[1;35m****\e[0;37m" << endl;
   cout << "\e[1;35m********************************************************************************************************************************************\e[0;37m" << endl;  
-  Trie trie = Trie();
-  Trie favorities = Trie();
+  Trie *trie = new Trie();
+  Trie *favorities = new Trie();
   string word, pos, meaning; //stores the word and meaning
   char choice;  //stores user choice for the actions
   while (choice != 's') //while loop until 's' is entered
@@ -78,6 +78,7 @@ void mainMenu() //menu function
       case('1'):
       {
         readFileData(trie); //read the file data
+        favorities->display(favorities->root,""); //display the favorities
       }; break;
 
       case('2'):
@@ -90,7 +91,7 @@ void mainMenu() //menu function
         cout << "\e[46mEnter the word: \x1b[0m ";
         cin.ignore();
         cin >> word; //get the word from user
-        Dictionary dict = trie.search(word); //search the word in the trie
+        Dictionary dict = trie->search(word); //search the word in the trie
         if(dict.word == "") //if word not found
         {
           cout << "\e[0;31m\nWord not found!\n\x1b[0m\n";
@@ -105,9 +106,10 @@ void mainMenu() //menu function
           string fav;
           cin.ignore();
           cin>>fav; // Ask user if he wants to add the word to favorities
-          if (fav=="y")
-            favorities.insert(dict);
-            cout<<"\e[0;32mWord added to favorities!\x1b[0m";
+          if (fav=="y"){
+            favorities->insert(dict);
+            cout<<"\e[0;32mWord added to favorities!\n\x1b[0m";
+          }
         }
       }; break;
 
@@ -117,13 +119,13 @@ void mainMenu() //menu function
         do
         {
           cout << "\e[1;33mFavorities: \n\x1b[0m ";
-          favorities.display(favorities.root,""); //display the favorities
+          favorities->display(favorities->root,""); //display the favorities
           cout << "\e[46m Do you want to remove any word from favorities.\nIf yes Enter the word! Enter -1 to exit: \x1b[0m ";
           cin.ignore();
           cin >> word;
           if (word!="-1"){
-            favorities.deleteWord(word); //delete the word from favorities
-            cout<<"\e[0;32mWord deleted succesfully!\x1b[0m";
+            favorities->deleteWord(word); //delete the word from favorities
+            cout<<"\e[0;32mWord deleted succesfully!\n\x1b[0m";
           }
         } while (word!="-1"); //loop until user enters -1
       }; break;
@@ -133,7 +135,7 @@ void mainMenu() //menu function
         cout << "\e[46mEnter the Prefix\x1b[0m ";
         cin.ignore();
         cin >> word;
-        Trie t = filterWords(trie, word); //filter the words
+        Trie *t = filterWords(trie, word); //filter the words
         cout<<"\e[0;32mFiltered the list succesfully!\n\nDo you want to write (w) it in a file or want to see (d)? w/d \x1b[0m\n";
         string write;
         cin >> write; // Ask user if he wants to write the filtered list in a file
@@ -144,7 +146,7 @@ void mainMenu() //menu function
         }
         else if(write == "d")
         {
-          t.display(t.root,"");
+          t->display(t->root,"");
         }
       }; break;
 
@@ -153,7 +155,7 @@ void mainMenu() //menu function
 	      cout << "\e[46mEnter the word: \x1b[0m ";
         string s;
         cin>>s;
-        trie.deleteWord(s); //delete the word from trie
+        trie->deleteWord(s); //delete the word from trie
         cout<<"\e[0;32mWord deleted succesfully!\x1b[0m";
       }; break;
 
