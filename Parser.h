@@ -78,7 +78,6 @@ void mainMenu() //menu function
       case('1'):
       {
         readFileData(trie); //read the file data
-        favorities->display(favorities->root,""); //display the favorities
       }; break;
 
       case('2'):
